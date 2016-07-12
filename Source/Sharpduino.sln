@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino", "Sharpduino.csproj", "{5497542C-2A99-445C-809D-0E91AA68F3E2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Console", "Sharpduino.Console\Sharpduino.Console.csproj", "{2A822519-FB61-44B4-80B9-6F6CBFC672BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Tests", "Sharpduino.Tests\Sharpduino.Tests.csproj", "{26250240-758C-4849-9FD4-0FCB990321B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Core", "Sharpduino.Core\Sharpduino.Core.csproj", "{F535BC2B-1D09-4419-9DD0-C805CA368F09}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26250240-758C-4849-9FD4-0FCB990321B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26250240-758C-4849-9FD4-0FCB990321B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26250240-758C-4849-9FD4-0FCB990321B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26250240-758C-4849-9FD4-0FCB990321B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A822519-FB61-44B4-80B9-6F6CBFC672BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A822519-FB61-44B4-80B9-6F6CBFC672BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A822519-FB61-44B4-80B9-6F6CBFC672BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A822519-FB61-44B4-80B9-6F6CBFC672BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
