@@ -40,7 +40,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="Sharpduino.Core\Sharpduino.Core.csproj">
+    <ProjectReference Include="..\Sharpduino.Core\Sharpduino.Core.csproj">
       <Project>{F535BC2B-1D09-4419-9DD0-C805CA368F09}</Project>
       <Name>Sharpduino.Core</Name>
     </ProjectReference>

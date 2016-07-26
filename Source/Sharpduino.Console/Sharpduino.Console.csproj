@@ -36,7 +36,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\..\Sharpduino.Boards\Sharpduino.Boards.csproj">
+    <ProjectReference Include="..\Sharpduino.Boards\Sharpduino.Boards.csproj">
       <Project>{3380148c-3cca-4304-877f-654213483ae3}</Project>
       <Name>Sharpduino.Boards</Name>
     </ProjectReference>
@@ -44,8 +44,8 @@
       <Project>{f535bc2b-1d09-4419-9dd0-c805ca368f09}</Project>
       <Name>Sharpduino.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sharpduino.csproj">
-      <Project>{5497542C-2A99-445C-809D-0E91AA68F3E2}</Project>
+    <ProjectReference Include="..\Sharpduino\Sharpduino.csproj">
+      <Project>{5497542c-2a99-445c-809d-0e91aa68f3e2}</Project>
       <Name>Sharpduino</Name>
     </ProjectReference>
   </ItemGroup>

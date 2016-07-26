@@ -96,11 +96,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Source\Sharpduino.Core\Sharpduino.Core.csproj">
+    <ProjectReference Include="..\Sharpduino.Core\Sharpduino.Core.csproj">
       <Project>{f535bc2b-1d09-4419-9dd0-c805ca368f09}</Project>
       <Name>Sharpduino.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Source\Sharpduino.csproj">
+    <ProjectReference Include="..\Sharpduino\Sharpduino.csproj">
       <Project>{5497542c-2a99-445c-809d-0e91aa68f3e2}</Project>
       <Name>Sharpduino</Name>
     </ProjectReference>
