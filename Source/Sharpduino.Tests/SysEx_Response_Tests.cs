@@ -4,10 +4,10 @@ using NUnit.Framework;
 namespace Sharpduino.Tests.Firmata
 {
 	[TestFixture,Category("Protocol_Write")]
-	public class SysEx_Tests
+	public class SysEx_Response_Tests
 	{
 		[Test]
-		public void QueryFirmwareNameAndVersion_Valid_Success(){			
+		public void QueryFirmwareNameAndVersion_Valid_Success(){		
 
 			var port = new TestCommTransports.TestTransport ();
 

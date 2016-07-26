@@ -5,11 +5,11 @@ using System.Runtime.CompilerServices;
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle ("Sharpduino.Core")]
-[assembly: AssemblyDescription ("")]
+[assembly: AssemblyDescription("CSharp library to connect to Firmata servers.")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("")]
-[assembly: AssemblyCopyright ("developerii")]
+[assembly: AssemblyCompany("Binamedia")]
+[assembly: AssemblyProduct("Sharpduino")]
+[assembly: AssemblyCopyright("Dan Miranda")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 

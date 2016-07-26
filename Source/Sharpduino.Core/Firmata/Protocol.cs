@@ -15,11 +15,29 @@ namespace Sharpduino.Firmata
 	/// </summary>
 	public class Protocol : IDisposable
 	{
-		const int MAX_DATA_BYTES   = 1024;
+        private SynchronizationContext _syncCtx;
+
+        #region Events
+        public delegate void OnServerVersion(int mayorVersion, int minorVersion, string name);
+        public event OnServerVersion ServerVersion;
+
+        public delegate void OnDataRead(int data);
+        public event OnDataRead DataRead;
+
+        public delegate void OnDigitalWrite(string data);
+        public event OnDigitalWrite DigitalWriteData;
+
+        public delegate void OnAnalogRead(string data);
+        public event OnAnalogRead AnalogRead;
+        #endregion
+
+        #region Locals
+        const int MAX_DATA_BYTES   = 1024;
 
 		const int MAX_AVAILABLE_PIN = 127;
 
 		readonly ICommTransport _commTransport;
+
 		const int _delay = 3000;
 
 		int _waitForData = 0;
@@ -29,18 +47,18 @@ namespace Sharpduino.Firmata
 		bool _parsingSysex;
 		int _sysexBytesRead;
 
-		volatile int[] digitalOutputData = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		volatile int[] digitalInputData  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-		volatile int[] analogInputData   = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		volatile int[] _digitalOutputData = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		volatile int[] _digitalInputData  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+		volatile int[] _analogInputData   = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-		const int _majorVersion = 2;
-		const int _minorVersion = 4;
+		private const int _majorVersion = 2;
+		private const int _minorVersion = 5;
 
 		public int ClientMayorVersion { get; set; } = 0;
 		public int ClientMinorVersion { get; set; } = 0;
 
-		Task readThread = null;
-		object locker = new object();
+		Task _readThread = null;
+		object _locker = new object();
 
 		SysExCommands _sysEx;
 		public SysExCommands SysEx {
@@ -54,75 +72,72 @@ namespace Sharpduino.Firmata
 				return (_commTransport != null) && _commTransport.IsOpen; 
 			} 
 		}
+        #endregion
 
-		#region Constructors
+        #region Constructors
 
-		public Protocol()
-		{
-		}
-
-		public Protocol(ICommTransport commTransport)
+        public Protocol(ICommTransport commTransport)
 		{
 			_commTransport = commTransport;
 			_sysEx = new SysExCommands (_commTransport);
+            _syncCtx = SynchronizationContext.Current;
+            _sysEx.OnQueryFirmwareNameAndVersionResponse += _sysEx_OnQueryFirmwareNameAndVersionResponse;
 			if (_commTransport.AutoStart) {
 				Open ();
 			}	
 		}
-			
-		#endregion
 
-		/// <summary>
-		/// Opens the serial port connection, should it be required. By default the port is
-		/// opened when the object is first created.
-		/// </summary>
-		public void Open()
+        private void _sysEx_OnQueryFirmwareNameAndVersionResponse(int majorVersion, int minorVersion, string name)
+        {
+            var serverVersion = majorVersion + (minorVersion * 0.1);
+            var clientVersion = this.ClientMayorVersion + (this.ClientMinorVersion * 0.1);
+            if (serverVersion < clientVersion) {
+                throw new Exception(String.Format("Please update Firmata version on device to {0}.{1}", ClientMayorVersion, ClientMinorVersion));
+            }
+            ClientMayorVersion = majorVersion;
+            ClientMinorVersion = minorVersion;
+            ServerVersion?.Invoke(majorVersion, minorVersion, name);
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Opens the serial port connection, should it be required. By default the port is
+        /// opened when the object is first created.
+        /// </summary>
+        public void Open()
 		{			
-
 			Task.Delay(_delay);
-			//TODO: Watch for inputs
-//			byte[] command = new byte[2];
-//
-//			for (int i = 0; i < 6; i++)
-//			{
-//				command[0] = (byte)((int)MessageType.REPORT_ANALOG | i);
-//				command[1] = (byte)1;
-//				_commTransport.Write(command, 0, 2);
-//			}
-//
-//			for (int i = 0; i < 2; i++)
-//			{
-//				command[0] = (byte)((int)MessageType.REPORT_DIGITAL | i);
-//				command[1] = (byte)1;
-//				_commTransport.Write(command, 0, 2);
-//			}
-//			command = null;
+            _commTransport.Open();
+            //TODO: Enable for production
+            //for (int pin = 0; pin < 6; pin++)
+            //{
+            //    ToggleAnalogInReporting(pin, true);
+            //}
 
-			if (readThread == null)
+            //for (int port = 0; port < 2; port++)
+            //{
+            //    ToggleDigitalPortReporting(port, true);
+            //}
+
+            if (_readThread == null)
 			{
-				readThread = new Task(ProcessInput);
-				readThread.Start();
+				_readThread = new Task(ProcessInput);
+				_readThread.Start();
 			}
 		}
 
-		/// <summary>
-		/// Closes the serial port.
-		/// </summary>
-		public void Close()
-		{
-//			readThread.Join(500);
-//			readThread = null;
-			_commTransport.Close();
+        /// <summary>
+        /// Closes the serial port.
+        /// </summary>
+        public void Close()
+        {
+            if (_commTransport != null)
+            {
+                _commTransport.Close();
+                _readThread = null;
+            }
 		}
-
-		/// <summary>
-		/// Lists all available serial ports on current system.
-		/// </summary>
-		/// <returns>An array of strings containing all available serial ports.</returns>
-//		public static string[] list()
-//		{
-//			return SerialPort.GetPortNames();
-//		}
 
 		#region Data Message Expanssion
 
@@ -137,15 +152,20 @@ namespace Sharpduino.Firmata
 			}
 			int port = (pin >> 3) & 0x0F;
 			if (value == 0) {
-				digitalOutputData [port] &= ~(1 << (pin & 0x07));			
+				_digitalOutputData [port] &= ~(1 << (pin & 0x07));			
 			} else {
-				digitalOutputData [port] |= (1 << (pin & 0x07));
+				_digitalOutputData [port] |= (1 << (pin & 0x07));
 			}
-			_commTransport.Write (new byte[3] {
-				(byte)((int)MessageTypesEnum.DIGITAL_MESSAGE | port),
-				(byte)(digitalOutputData [port] & 0x7F),
-				(byte)(digitalOutputData [port] >> 7)
-			}, 0, 3);			
+            _commTransport.Write(new byte[3] {
+                (byte)((int)MessageTypesEnum.DIGITAL_MESSAGE | port),
+                (byte)(_digitalOutputData [port] & (byte)SysExCommandsEnum.REALTIME),
+                (byte)(_digitalOutputData [port] >> 7)
+            }, 0, 3);
+            string data = string.Empty;
+            foreach (int n in _digitalOutputData) {
+                data = data + string.Format("{0:X}, ", n);
+            }
+            _syncCtx.Send((x) => DigitalWriteData?.Invoke(data), null);
 		}
 
 		/// <summary>
@@ -167,9 +187,9 @@ namespace Sharpduino.Firmata
 		/// </summary>
 		public void ReportVersion(){
 			_commTransport.Write (new byte[3] {
-				(byte)((int)MessageTypesEnum.REPORT_VERSION),
-				(byte)(_majorVersion),
-				(byte)(_minorVersion)
+				(byte)MessageTypesEnum.REPORT_VERSION,
+				(byte)_majorVersion,
+				(byte)_minorVersion
 			}, 0, 3);
 		}
 		#endregion
@@ -197,33 +217,34 @@ namespace Sharpduino.Firmata
 		public void SetDigitalPinValue(int pin, Sharpduino.Core.DigitalValue value)
 		{
 			_commTransport.Write(new byte[3] { 
-				(byte)(MessageTypesEnum.SetDigitalPinValue),
+				(byte)(MessageTypesEnum.SET_DIGITAL_PIN_VALUE),
 				(byte)(pin),
 				(byte)(value)
 			} , 0, 3);
-		}			
+		}
 
-		/// <summary>
-		/// Toogles the analog in reporting.
-		/// </summary>
-		/// <param name="pin">Arduino pin to report.</param>
-		/// <param name="reportPin">If set to <c>true</c> report pin.</param>
-		public void ToggleAnalogInReporting(int pin, bool reportPin){
+        /// <summary>
+        /// Toogles the analog in reporting.
+        /// </summary>
+        /// <param name="pin">Arduino pin to report.</param>
+        /// <param name="enable">If set to <c>true</c> report pin.</param>
+        public void ToggleAnalogInReporting(int pin, bool enable){
 			_commTransport.Write (new byte[2] { 
 				(byte)((int)MessageTypesEnum.REPORT_ANALOG | pin),
-				(byte)((reportPin) ? 0x01 : 0x00)
+				(byte)((enable) ? 0x01 : 0x00)
 			}, 0, 2);
 		}
 
-		/// <summary>
-		/// Toogles the digital in reporting.
-		/// </summary>
-		/// <param name="port">Arduino pin to report.</param>
-		/// <param name="reportPin">If set to <c>true</c> report pin.</param>
-		public void ToggleDigitalPortReporting(int port, bool reportPin){
+        /// <summary>
+        /// Toogles the digital in reporting.
+        /// </summary>
+        /// <param name="port">Arduino port to report.</param>
+        /// <param name="enable">If set to <c>true</c> report pin.</param>
+        public void ToggleDigitalPortReporting(int port, bool enable)
+        {
 			_commTransport.Write (new byte[2] { 
 				(byte)((int)MessageTypesEnum.REPORT_DIGITAL | port),
-				(byte)((reportPin) ? 0x01 : 0x00)
+				(byte)((enable) ? 0x01 : 0x00)
 			}, 0, 2);
 		}
 
@@ -241,9 +262,9 @@ namespace Sharpduino.Firmata
 		/// </summary>
 		/// <param name="pin">The arduino digital input pin.</param>
 		/// <returns>Arduino.HIGH or Arduino.LOW</returns>
-		public int digitalRead(int pin)
+		private int digitalRead(int pin)
 		{
-			return (digitalInputData[pin >> 3] >> (pin & 0x07)) & 0x01;
+			return (_digitalInputData[pin >> 3] >> (pin & 0x07)) & 0x01;
 		}
 
 		/// <summary>
@@ -251,34 +272,76 @@ namespace Sharpduino.Firmata
 		/// </summary>
 		/// <param name="pin">The arduino analog input pin.</param>
 		/// <returns>A value representing the analog value between 0 (0V) and 1023 (5V).</returns>
-		public int analogRead(int pin)
+		private int analogRead(int pin)
 		{
-			return analogInputData[pin];
+			return _analogInputData[pin];
 		}
 
 		private void setDigitalInputs(int portNumber, int portData)
 		{
-			digitalInputData[portNumber] = portData;
-		}
+			_digitalInputData[portNumber] = portData;
+
+            string data = string.Empty;
+            foreach (int n in _digitalInputData)
+            {
+                data = data + string.Format("{0:X}, ", n);
+            }
+
+            if (DigitalWriteData != null)
+            {
+                if (_syncCtx != null)
+                {
+                    _syncCtx.Send((x) => DigitalWriteData?.Invoke(data), null);
+                }
+                else
+                {
+                    DigitalWriteData?.Invoke(data);
+                }
+            }
+        }
 
 		private void setAnalogInput(int pin, int value)
 		{
-			analogInputData[pin] = value;
+			_analogInputData[pin] = value;
+
+            string data = string.Empty;
+            foreach (int n in _analogInputData)
+            {
+                data = data + string.Format("{0:X}, ", n);
+            }
+            
+            if (AnalogRead != null)
+            {
+                if (_syncCtx != null)
+                {
+                    _syncCtx.Send((x) => AnalogRead?.Invoke(data), null);
+                }
+                else {
+                    AnalogRead?.Invoke(data);
+                }
+            }
 		}
 
-		private void SetClientVersion(int majorVersion, int minorVersion)
+		private void SetServerVersion(int majorVersion, int minorVersion)
 		{
-			ClientMayorVersion = majorVersion;
-			ClientMinorVersion = minorVersion;
-			Debug.WriteLine ("Firmata Server Version: {0}.{1}", ClientMayorVersion, ClientMinorVersion);
+			Debug.WriteLine ("Firmata Server Version: {0}.{1}", majorVersion, minorVersion);
+            ClientMayorVersion = majorVersion;
+            ClientMinorVersion = minorVersion;
+            if (ServerVersion != null)
+            {
+                if (_syncCtx != null)
+                {
+                    _syncCtx.Send((x) => ServerVersion?.Invoke(majorVersion, minorVersion, ""), null);
+                }
+                else
+                {
+                    ServerVersion?.Invoke(majorVersion, minorVersion, "");
+                }
+            }
 		}
-		#endregion
-		private int available()
-		{
-			return _commTransport.BytesToRead;
-		} 
+        #endregion
 
-		public void ProcessInput()
+		private void ProcessInput()
 		{
 			while (_commTransport.IsOpen)
 			{
@@ -288,7 +351,11 @@ namespace Sharpduino.Firmata
 					{
 						int inputData = _commTransport.ReadByte();
 						int command;
-						//System.Diagnostics.Debug.WriteLine ("{0:X}", inputData);
+						System.Diagnostics.Debug.WriteLine ("{0:X}", inputData);
+                        if (DataRead != null)
+                        {
+                            _syncCtx.Send((x) => DataRead.Invoke(inputData), null);
+                        }
 						if (_parsingSysex)
 						{
 							if (inputData == (int)MessageTypesEnum.END_SYSEX)
@@ -312,23 +379,23 @@ namespace Sharpduino.Firmata
 							{
 								//we got everything
 								switch (_executeMultiByteCommand) {
-								case (int)MessageTypesEnum.DIGITAL_MESSAGE:
-									setDigitalInputs (_multiByteChannel, (_storedInputData [0] << 7) + _storedInputData [1]);
-									break;
-								case (int)MessageTypesEnum.ANALOG_MESSAGE:
-									setAnalogInput (_multiByteChannel, (_storedInputData [0] << 7) + _storedInputData [1]);
-									break;
-								case (int)MessageTypesEnum.REPORT_VERSION:
-									SetClientVersion (_storedInputData [1], _storedInputData [0]);
-									break;
+								    case (int)MessageTypesEnum.DIGITAL_MESSAGE:
+									    setDigitalInputs (_multiByteChannel, (_storedInputData [0] << 7) + _storedInputData [1]);
+									    break;
+								    case (int)MessageTypesEnum.ANALOG_MESSAGE:
+									    setAnalogInput (_multiByteChannel, (_storedInputData [0] << 7) + _storedInputData [1]);
+									    break;
+								    case (int)MessageTypesEnum.REPORT_VERSION:
+									    SetServerVersion (_storedInputData [1], _storedInputData [0]);
+									    break;
 								}
 							}
 						}
 						else
 						{
-							if (inputData < 0xF0)
+							if (inputData < (int)MessageTypesEnum.START_SYSEX)
 							{
-								command = inputData & 0xF0;
+								command = inputData & (int)MessageTypesEnum.START_SYSEX;
 								_multiByteChannel = inputData & 0x0F;
 							}
 							else
@@ -337,18 +404,18 @@ namespace Sharpduino.Firmata
 								// commands in the 0xF* range don't use channel data
 							}
 							switch (command) {
-							case (int)MessageTypesEnum.START_SYSEX:
-								_sysexBytesRead = 0;
-								_storedInputData [_sysexBytesRead] = (byte)MessageTypesEnum.START_SYSEX;
-								_sysexBytesRead++;
-								_parsingSysex = true;
-								break;
-							case (int)MessageTypesEnum.DIGITAL_MESSAGE:
-							case (int)MessageTypesEnum.ANALOG_MESSAGE:
-							case (int)MessageTypesEnum.REPORT_VERSION:
-								_waitForData = 2;
-								_executeMultiByteCommand = command;
-								break;
+							    case (int)MessageTypesEnum.START_SYSEX:
+								    _sysexBytesRead = 0;
+								    _storedInputData [_sysexBytesRead] = (byte)MessageTypesEnum.START_SYSEX;
+								    _sysexBytesRead++;
+								    _parsingSysex = true;
+								    break;
+							    case (int)MessageTypesEnum.DIGITAL_MESSAGE:
+							    case (int)MessageTypesEnum.ANALOG_MESSAGE:
+							    case (int)MessageTypesEnum.REPORT_VERSION:
+								    _waitForData = 2;
+								    _executeMultiByteCommand = command;
+								    break;
 							}
 						}
 					}
@@ -356,9 +423,8 @@ namespace Sharpduino.Firmata
 			}
 		}
 
-		public void ProcessSysexMessage() {
+		private void ProcessSysexMessage() {
 			_sysEx.ParseSysEx (_storedInputData);
-			//System.Diagnostics.Debug.WriteLine ("{0:X}", _storedInputData[0]);
 			_sysexBytesRead = 0;
 		}
 
@@ -370,6 +436,5 @@ namespace Sharpduino.Firmata
 			}
 		}
 		#endregion
-	} // End Arduino class
-
-} // End namespace
+	}
+}

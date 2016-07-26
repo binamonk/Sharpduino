@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Sharpduino.Tests.TestCommTransports
@@ -13,6 +15,7 @@ namespace Sharpduino.Tests.TestCommTransports
 		{
 			_writeBuffer = new StringBuilder ();
 			_isOpen = AutoStart;
+            _memoryStream = new System.IO.MemoryStream();
 		}
 
 		#region ICommTransport implementation
@@ -35,15 +38,20 @@ namespace Sharpduino.Tests.TestCommTransports
 		}
 
 		public int ReadByte ()
-		{
-			throw new NotImplementedException ();
-		}
+		{;
+            var dataByte =  _memoryStream.ReadByte();
+            if (_memoryStream.Position == _memoryStream.Length) {
+                _memoryStream.Flush();
+            }
+            return dataByte;
+        }
 
 		public bool IsOpen {
 			get {
 				return _isOpen;
 			}
 		}
+
 
 		public int DataBits {
 			get {
@@ -54,9 +62,10 @@ namespace Sharpduino.Tests.TestCommTransports
 			}
 		}
 
+        volatile System.IO.MemoryStream _memoryStream;
 		public int BytesToRead {
 			get {
-				return 0;
+				return (int)_memoryStream.Length;
 			}
 		}
 
@@ -72,7 +81,15 @@ namespace Sharpduino.Tests.TestCommTransports
 			_writeBuffer.Clear ();
 			return buffer;
 		}
-		#endregion
-	}
+        #endregion
+
+        public void SimulateReception(string message)
+        {
+            var strData = message.Split(' ').ToList();
+            byte[] data = strData.Select(it => (byte)Convert.ToInt32(it,16)).ToArray();
+            _memoryStream.Write(data, 0, data.Length);
+            _memoryStream.Position = 0;
+        }
+    }
 }
 

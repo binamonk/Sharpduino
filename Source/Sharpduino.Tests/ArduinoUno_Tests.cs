@@ -14,7 +14,6 @@ namespace Sharpduino.Tests
 				var led = new Components.Led (13);
 				board.AddComponent (led);
 				led.On();
-				System.Console.ReadKey ();
 			}
 			var x = comm.GetWritedData ();
 		}

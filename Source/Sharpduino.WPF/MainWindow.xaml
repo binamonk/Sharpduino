@@ -1,0 +1,57 @@
+﻿<Window x:Class="Sharpduino.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Sharpduino.WPF"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="543.229" Width="795.611">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="279"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="320"/>
+            <ColumnDefinition Width="178*"/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="btnConnect" Content="Connect" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="75" Click="btnConnect_Click" Height="20"/>
+        <StackPanel Grid.Column="0" Grid.Row="0" Background="#FF62AEB2" Grid.RowSpan="2" >
+            <Label Content="Firmata Server Version:"/>
+            <Label x:Name="lblVersion" Content="Unknown"/>
+            <Button x:Name="btnRequestFirmware" Content="Firmware Query" HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" Width="112" Click="btnRequestFirmware_Click"/>
+            <Button x:Name="btnRequestCapability" Content="Capability Query" HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" Width="112" Click="btnRequestCapability_Click"/>
+            <Button x:Name="btnRequestAnalog" Content="Analog Mapping Q." HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" Width="112" Click="btnRequestAnalog_Click"/>
+            <Button x:Name="btnPinStateQuery" Content="Pin State Query" HorizontalAlignment="Left" Height="29" Margin="20,0,0,0" Width="112" Click="btnPinStateQuery_Click"/>
+        </StackPanel>
+        <RichTextBox x:Name="richTextBox" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+            <FlowDocument>
+                <Paragraph>
+                    <Run Text=""/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+        <Label Content="DigitalOutput:" Grid.Column="1" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Height="26" Width="85"/>
+        <Label Content="DigitalInput:" Grid.Column="1" HorizontalAlignment="Left" Margin="10,66,0,0" VerticalAlignment="Top" Height="26" Width="75"/>
+        <Label Content="AnalogInput:" Grid.Column="1" HorizontalAlignment="Left" Margin="10,97,0,0" VerticalAlignment="Top" Height="26" Width="78"/>
+
+        <Label x:Name="lblDigitalOutput" Content="0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,35,0,0" VerticalAlignment="Top" Height="26" Width="202"/>
+        <Label x:Name="lblDigitalInput" Content="0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,66,0,0" VerticalAlignment="Top" Height="26" Width="202"/>
+        <Label x:Name="lblAnalogInput" Content="0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,97,0,0" VerticalAlignment="Top" Height="26" Width="202"/>
+
+        <Button x:Name="btnWrite" Content="Write Dig 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,10,0,0" VerticalAlignment="Top" Width="75" Click="btnWrite_Click" Height="20"/>
+        <Button x:Name="btnSetDigitalPinMode" Content="Set Digital Pin Mode" Grid.Column="1" HorizontalAlignment="Left" Margin="115,128,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinMode_Click"/>
+        <ComboBox x:Name="cmbMode" Grid.Column="1" HorizontalAlignment="Left" Margin="10,155,0,0" VerticalAlignment="Top" Width="100" Height="22" >
+        </ComboBox>
+        <ComboBox x:Name="cmbPin" Grid.Column="1" HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top" Width="100" ItemsSource="{Binding Sharpduino.Core.PinMode}" Height="22" />
+        <Button x:Name="btnSetDigitalPinValue" Content="SetDigitalPinValue" Grid.Column="1" HorizontalAlignment="Left" Margin="115,155,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinValue_Click"/>
+        <CheckBox x:Name="chkDigitalValue" Content="Digital Value" Grid.Column="1" HorizontalAlignment="Left" Margin="10,182,0,0" VerticalAlignment="Top" Width="100" Height="22"/>
+        <ComboBox x:Name="cmbAnalogPin" Grid.Column="2" HorizontalAlignment="Left" Margin="0,128,0,0" VerticalAlignment="Top" Width="98"/>
+        <CheckBox x:Name="chkAnalogEnabled" Content="Report Enabled" Grid.Column="1" HorizontalAlignment="Left" Margin="318,155,0,0" VerticalAlignment="Top" Width="100" Height="22" Grid.ColumnSpan="2"/>
+        <Button x:Name="btnToogleAnalogReport" Content="Toogle AnalogIn Report" Grid.Column="2" HorizontalAlignment="Left" Margin="103,128,-17,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnToogleAnalogReport_Click"/>
+        <Button x:Name="btnToogleDigitalReport" Content="Toogle Digital Report" Grid.Column="2" HorizontalAlignment="Left" Margin="103,182,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnToogleDigitalReport_Click"/>
+        <ComboBox x:Name="cmbDigitalPort" Grid.Column="2" HorizontalAlignment="Left" Margin="0,182,0,0" VerticalAlignment="Top" Width="98"/>
+
+    </Grid>
+</Window>

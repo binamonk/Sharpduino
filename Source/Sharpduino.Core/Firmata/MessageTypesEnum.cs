@@ -11,7 +11,7 @@ namespace Sharpduino.Firmata
 
 		START_SYSEX           			= 0xF0, // start a MIDI SysEx message
 		SET_PIN_MODE          			= 0xF4, // set a pin to INPUT/OUTPUT/PWM/etc
-		SetDigitalPinValue    			= 0xF5, // set a digital pin to INPUT/OUTPUT
+		SET_DIGITAL_PIN_VALUE  			= 0xF5, // set a digital pin to INPUT/OUTPUT
 		END_SYSEX             			= 0xF7, // end a MIDI SysEx message
 		REPORT_VERSION        			= 0xF9, // report firmware version
 

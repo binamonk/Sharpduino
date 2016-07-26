@@ -2,16 +2,18 @@
 using Sharpduino.CommTransports;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace Sharpduino.Firmata
 {
 	public class SysExCommands
 	{
-		readonly ICommTransport _comm;
-		List<SysExCommandsEnum> _pendingResponses;
+		private readonly ICommTransport _comm;
+		private List<SysExCommandsEnum> _pendingResponses;
 
-		#region Events
-		public delegate void ReceiveFirmwareResponse(int mayorVersion, int minorVersion, string name);
+        System.Threading.SynchronizationContext _syncCtx;
+        #region Events
+        public delegate void ReceiveFirmwareResponse(int mayorVersion, int minorVersion, string name);
 		public event ReceiveFirmwareResponse OnQueryFirmwareNameAndVersionResponse;
 		#endregion
 
@@ -19,16 +21,24 @@ namespace Sharpduino.Firmata
 		{
 			_comm = comm;
 			_pendingResponses = new List<SysExCommandsEnum> ();
+            _syncCtx = System.Threading.SynchronizationContext.Current;
+            
 		}
 
 		public void ParseSysEx(byte [] message){
 			switch (message [1]) {
-			case (byte)SysExCommandsEnum.REPORT_FIRMWARE:
-				ReceiveFirmware (message);
-				break;
-			case (byte)SysExCommandsEnum.CAPABILITY_RESPONSE:
-				CapabilityResponse (message);
-				break;
+			    case (byte)SysExCommandsEnum.REPORT_FIRMWARE:
+				    ReceiveFirmware (message);
+				    break;
+			    case (byte)SysExCommandsEnum.CAPABILITY_RESPONSE:
+				    CapabilityResponse (message);
+				    break;
+                case (byte)SysExCommandsEnum.EXTENDED_ANALOG:
+                    ExtendedAnalogMessage(message);
+                    break;
+                case (byte)SysExCommandsEnum.ANALOG_MAPPING_RESPONSE:
+                    AnalogMappingResponse(message);
+                    break;
 			}
 		}
 
@@ -36,9 +46,9 @@ namespace Sharpduino.Firmata
 
 		public void QueryFirmwareNameAndVersion(){			
 			_comm.Write (new byte[] {
-				(byte)((int)SysExCommandsEnum.START_SYSEX),
-				(byte)((int)SysExCommandsEnum.REPORT_FIRMWARE),
-				(byte)((int)SysExCommandsEnum.END_SYSEX)
+				(byte)SysExCommandsEnum.START_SYSEX,
+				(byte)SysExCommandsEnum.REPORT_FIRMWARE,
+				(byte)SysExCommandsEnum.END_SYSEX
 			}, 0, 3);
 			_pendingResponses.Add (SysExCommandsEnum.REPORT_FIRMWARE);
 		}
@@ -54,20 +64,27 @@ namespace Sharpduino.Firmata
 					serverName.Append (Convert.ToChar ((message[pos + 1] << 7) + message [pos]));
 				}
 			}
-			string name = serverName.ToString ();
-			if (OnQueryFirmwareNameAndVersionResponse != null) {
-				OnQueryFirmwareNameAndVersionResponse (mayorVersion, minorVersion, name);
-			}
-		}
+            if (OnQueryFirmwareNameAndVersionResponse != null)
+            {
+                if (_syncCtx != null)
+                {
+                    _syncCtx.Send((x) => OnQueryFirmwareNameAndVersionResponse?.Invoke(mayorVersion, minorVersion, serverName.ToString()), null);
+                }
+                else {
+                    OnQueryFirmwareNameAndVersionResponse?.Invoke(mayorVersion, minorVersion, serverName.ToString());
+                }
+            }
+        }
 		#endregion
 
 		// Extended Analog
-		public void ExtendedAnalogMessage() {
-			throw new NotImplementedException ();
+		public void ExtendedAnalogMessage(byte[] message) {
+            throw new NotImplementedException();
 		}
 
-		// Capability Query
-		public void CapabilityQuery(){			
+        #region Capability Query (WIP)
+        // Capability Query
+        public void CapabilityQuery(){			
 			_comm.Write (new byte[] {
 				(byte)((int)SysExCommandsEnum.START_SYSEX),
 				(byte)((int)SysExCommandsEnum.CAPABILITY_QUERY),
@@ -93,26 +110,13 @@ namespace Sharpduino.Firmata
 					Debug.WriteLine ("     Pin Resolution {0}", message [count + 1]);
 				}
 			}
-				
-//			var x = 0;
-//			int mayorVersion = message [2];
-//			int minorVersion = message [3];
-//			var serverName = new System.Text.StringBuilder ();
-//			for (int pos = 4; pos <= 1024; pos += 2) {										
-//				if (message [pos] == (byte)SysExCommandsEnum.END_SYSEX) {					
-//					break;
-//				} else {
-//					serverName.Append (Convert.ToChar ((message[pos + 1] << 7) + message [pos]));
-//				}
-//			}
-//			string name = serverName.ToString ();
-//			if (OnQueryFirmwareNameAndVersionResponse != null) {
-//				OnQueryFirmwareNameAndVersionResponse (mayorVersion, minorVersion, name);
-//			}
 		}
 
-		// Analog Mapping Query
-		public void AnalogMappingQuery(){			
+        #endregion
+
+        #region Analog Mapping Query
+        // Analog Mapping Query
+        public void AnalogMappingQuery(){			
 			_comm.Write (new byte[] {
 				(byte)((int)SysExCommandsEnum.START_SYSEX),
 				(byte)((int)SysExCommandsEnum.ANALOG_MAPPING_QUERY),
@@ -122,24 +126,48 @@ namespace Sharpduino.Firmata
 			// Implement response
 		}
 
-		// Pin State Query
-		public void PinStateQuery(){			
+        public int[] AnalogMappingResponse(byte[] message) {
+            int[] res = new int[message.Length - 3];
+            for (int count = 2; count < 1024; count += 2)
+            {
+                if (message[count] == (byte)SysExCommandsEnum.END_SYSEX)
+                {
+                    break;
+                }
+                else {
+                    res[count - 2] = message[count];
+                }
+            }
+            return res;
+        }
+
+        #endregion
+
+        #region Pin State Query (WIP)
+        // Pin State Query
+        public void PinStateQuery(int pin){			
 			_comm.Write (new byte[] {
 				(byte)((int)SysExCommandsEnum.START_SYSEX),
 				(byte)((int)SysExCommandsEnum.PIN_STATE_QUERY),
-				(byte)((int)SysExCommandsEnum.END_SYSEX)
-			}, 0, 3);
+                (byte)pin,
+                (byte)((int)SysExCommandsEnum.END_SYSEX)
+			}, 0, 4);
 			_pendingResponses.Add (SysExCommandsEnum.PIN_STATE_RESPONSE);
 			// Implement response
 		}
 
-		public void SamplingInterval(int milliseconds){			
+        public void PinStateResponse() {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        public void SamplingInterval(int milliseconds){
 			_comm.Write (new byte[] {
-				(byte)((int)SysExCommandsEnum.START_SYSEX),
-				(byte)((int)SysExCommandsEnum.SAMPLING_INTERVAL),
+				(byte)SysExCommandsEnum.START_SYSEX,
+				(byte)SysExCommandsEnum.SAMPLING_INTERVAL,
 				(byte)(milliseconds & 0x7F),
 				(byte)(milliseconds >> 7),
-				(byte)((int)SysExCommandsEnum.END_SYSEX)
+				(byte)SysExCommandsEnum.END_SYSEX
 			}, 0, 5);
 		}
 	}

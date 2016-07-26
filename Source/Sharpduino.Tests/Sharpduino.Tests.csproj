@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -34,18 +34,18 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Protocol_ControlRead_Tests.cs" />
+    <Compile Include="SysEx_Response_Tests.cs" />
     <Compile Include="TestCommTransports\TestTransport.cs" />
     <Compile Include="Protocol_Control_Tests.cs" />
     <Compile Include="SysEx_Tests.cs" />
-    <Compile Include="ArduinoUno_Tests.cs" />
+    <None Include="ArduinoUno_Tests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TestCommTransports\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Sharpduino.csproj">
       <Project>{5497542C-2A99-445C-809D-0E91AA68F3E2}</Project>
@@ -55,5 +55,8 @@
       <Project>{F535BC2B-1D09-4419-9DD0-C805CA368F09}</Project>
       <Name>Sharpduino.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
 </Project>
