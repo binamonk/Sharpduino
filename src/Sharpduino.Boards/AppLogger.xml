@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sharpduino.Boards</name>
+    </assembly>
+    <members>
+        <member name="M:Sharpduino.Components.Led.On">
+            <summary>
+            Turn the led on.
+            </summary>
+        </member>
+        <member name="M:Sharpduino.Components.Led.Off">
+            <summary>
+            Turn the led off. If a led is strobing, it will not stop. Use Led.Stop().Off() to turn off a led while strobing.
+            </summary>
+        </member>
+        <member name="M:Sharpduino.Components.Led.Toggle">
+            <summary>
+            Toggle the current state, if on then turn off, if off then turn on.
+            </summary>
+        </member>
+        <member name="M:Sharpduino.Components.Led.Stop">
+            <summary>
+             For interval operations, call stop to stop the interval. stop does not necessarily turn "off" the Led, in order to fully shut down an Led, a program must call stop().off(). This operation will only work with Leds attached to PWM pins.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -41,12 +41,12 @@
         <Label x:Name="lblAnalogInput" Content="0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,97,0,0" VerticalAlignment="Top" Height="26" Width="202"/>
 
         <Button x:Name="btnWrite" Content="Write Dig 0" Grid.Column="1" HorizontalAlignment="Left" Margin="100,10,0,0" VerticalAlignment="Top" Width="75" Click="btnWrite_Click" Height="20"/>
-        <Button x:Name="btnSetDigitalPinMode" Content="Set Digital Pin Mode" Grid.Column="1" HorizontalAlignment="Left" Margin="115,128,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinMode_Click"/>
-        <ComboBox x:Name="cmbMode" Grid.Column="1" HorizontalAlignment="Left" Margin="10,155,0,0" VerticalAlignment="Top" Width="100" Height="22" >
+        <Button x:Name="btnSetDigitalPinMode" Content="Set Digital Pin Mode" Grid.Column="1" HorizontalAlignment="Left" Margin="10,155,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinMode_Click"/>
+        <ComboBox x:Name="cmbMode" Grid.Column="1" HorizontalAlignment="Left" Margin="167,155,0,0" VerticalAlignment="Top" Width="100" Height="22" >
         </ComboBox>
-        <ComboBox x:Name="cmbPin" Grid.Column="1" HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top" Width="100" ItemsSource="{Binding Sharpduino.Core.PinMode}" Height="22" />
-        <Button x:Name="btnSetDigitalPinValue" Content="SetDigitalPinValue" Grid.Column="1" HorizontalAlignment="Left" Margin="115,155,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinValue_Click"/>
-        <CheckBox x:Name="chkDigitalValue" Content="Digital Value" Grid.Column="1" HorizontalAlignment="Left" Margin="10,182,0,0" VerticalAlignment="Top" Width="100" Height="22"/>
+        <ComboBox x:Name="cmbPin" Grid.Column="1" HorizontalAlignment="Left" Margin="10,128,0,0" VerticalAlignment="Top" Width="100" ItemsSource="{Binding Sharpduino.Core.PinMode}" Height="22" RenderTransformOrigin="2.268,2.633" />
+        <Button x:Name="btnSetDigitalPinValue" Content="SetDigitalPinValue" Grid.Column="1" HorizontalAlignment="Left" Margin="10,182,0,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnSetDigitalPinValue_Click"/>
+        <CheckBox x:Name="chkDigitalValue" Content="Digital Value" Grid.Column="1" HorizontalAlignment="Left" Margin="167,186,0,0" VerticalAlignment="Top" Width="100" Height="22"/>
         <ComboBox x:Name="cmbAnalogPin" Grid.Column="2" HorizontalAlignment="Left" Margin="0,128,0,0" VerticalAlignment="Top" Width="98"/>
         <CheckBox x:Name="chkAnalogEnabled" Content="Report Enabled" Grid.Column="1" HorizontalAlignment="Left" Margin="318,155,0,0" VerticalAlignment="Top" Width="100" Height="22" Grid.ColumnSpan="2"/>
         <Button x:Name="btnToogleAnalogReport" Content="Toogle AnalogIn Report" Grid.Column="2" HorizontalAlignment="Left" Margin="103,128,-17,0" VerticalAlignment="Top" Width="143" Height="22" Click="btnToogleAnalogReport_Click"/>

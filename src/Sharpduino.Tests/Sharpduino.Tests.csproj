@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2A822519-FB61-44B4-80B9-6F6CBFC672BF}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>Sharpduino.Console</RootNamespace>
-    <AssemblyName>Sharpduino.Console</AssemblyName>
+    <ProjectGuid>{26250240-758C-4849-9FD4-0FCB990321B8}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Sharpduino.Tests</RootNamespace>
+    <AssemblyName>Sharpduino.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -17,7 +17,7 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -25,28 +25,28 @@
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Protocol_ControlRead_Tests.cs" />
+    <Compile Include="SysEx_Response_Tests.cs" />
+    <Compile Include="TestCommTransports\TestTransport.cs" />
+    <Compile Include="Protocol_Control_Tests.cs" />
+    <Compile Include="SysEx_Tests.cs" />
+    <None Include="ArduinoUno_Tests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Sharpduino.Boards\Sharpduino.Boards.csproj">
-      <Project>{3380148c-3cca-4304-877f-654213483ae3}</Project>
-      <Name>Sharpduino.Boards</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sharpduino.Core\Sharpduino.Core.csproj">
-      <Project>{f535bc2b-1d09-4419-9dd0-c805ca368f09}</Project>
-      <Name>Sharpduino.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sharpduino\Sharpduino.csproj">
-      <Project>{5497542c-2a99-445c-809d-0e91aa68f3e2}</Project>
-      <Name>Sharpduino</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
 </Project>

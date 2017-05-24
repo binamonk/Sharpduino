@@ -151,7 +151,7 @@ namespace Sharpduino.WPF
         {
             _protocol.ToggleDigitalPortReporting(
                 int.Parse(cmbDigitalPort.SelectedValue.ToString()),
-                chkDigitalValue.IsChecked.Value);
+                chkAnalogEnabled.IsChecked.Value);
         }
     }
 }

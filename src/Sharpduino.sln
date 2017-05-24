@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Console", "Sharpduino.Console\Sharpduino.Console.csproj", "{2A822519-FB61-44B4-80B9-6F6CBFC672BF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Tests", "Sharpduino.Tests\Sharpduino.Tests.csproj", "{26250240-758C-4849-9FD4-0FCB990321B8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Core", "Sharpduino.Core\Sharpduino.Core.csproj", "{F535BC2B-1D09-4419-9DD0-C805CA368F09}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino", "Sharpduino\Sharpduino.csproj", "{5497542C-2A99-445C-809D-0E91AA68F3E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Boards", "Sharpduino.Boards\Sharpduino.Boards.csproj", "{3380148C-3CCA-4304-877F-654213483AE3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.WPF", "Sharpduino.WPF\Sharpduino.WPF.csproj", "{07ABFDA6-860F-4C66-9FE5-AFB7335A3A25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sharpduino.Core", "Sharpduino.Core\Sharpduino.Core.csproj", "{7B4240FF-D6A0-4AA1-9624-D123893F9571}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,6 @@ Global
 		{26250240-758C-4849-9FD4-0FCB990321B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26250240-758C-4849-9FD4-0FCB990321B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26250240-758C-4849-9FD4-0FCB990321B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F535BC2B-1D09-4419-9DD0-C805CA368F09}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5497542C-2A99-445C-809D-0E91AA68F3E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,6 +41,10 @@ Global
 		{07ABFDA6-860F-4C66-9FE5-AFB7335A3A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{07ABFDA6-860F-4C66-9FE5-AFB7335A3A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{07ABFDA6-860F-4C66-9FE5-AFB7335A3A25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B4240FF-D6A0-4AA1-9624-D123893F9571}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B4240FF-D6A0-4AA1-9624-D123893F9571}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B4240FF-D6A0-4AA1-9624-D123893F9571}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B4240FF-D6A0-4AA1-9624-D123893F9571}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

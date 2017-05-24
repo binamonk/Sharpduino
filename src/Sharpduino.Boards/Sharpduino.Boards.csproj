@@ -32,14 +32,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>Sharpduino.xml</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- A reference to the entire .NET Framework is automatically included -->
-    <ProjectReference Include="..\Sharpduino.Core\Sharpduino.Core.csproj">
-      <Project>{f535bc2b-1d09-4419-9dd0-c805ca368f09}</Project>
-      <Name>Sharpduino.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <None Include="ArduinoUno.cs" />
     <Compile Include="BoardPin.cs" />

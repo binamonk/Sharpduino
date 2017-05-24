@@ -25,6 +25,7 @@ namespace Sharpduino.Console
 
             using (var protocol = new Sharpduino.Firmata.Protocol (serial)) {
 
+                protocol.ServerVersion += Protocol_ServerVersion;
                 if (serial.IsOpen)
                 {
                     System.Console.WriteLine("Connected!");
@@ -33,20 +34,33 @@ namespace Sharpduino.Console
                     System.Console.WriteLine("Not Connected!");
                 }
 
+                protocol.RequestVersionReport();
+                protocol.SysEx.QueryFirmwareNameAndVersion();
+                protocol.SysEx.CapabilityQuery();
                 //protocol.RequestVersionReport();
                 protocol.SetPinMode(13, Sharpduino.Core.PinMode.Output);
+                protocol.ToggleDigitalPortReporting(1, true);
                 protocol.DigitalWrite (13, Sharpduino.Core.DigitalValue.High);
-                protocol.ToggleDigitalPortReporting(0, true);
+                protocol.SetPinMode(14, Core.PinMode.Serial);
+                protocol.ToggleDigitalPortReporting(1, true);
+                protocol.ToggleAnalogInReporting(1, true);
+                protocol.ToggleAnalogInReporting(0, true);
                 //
                 //				System.Threading.Thread.Sleep (3000);
-                System.Console.ReadKey();
+                
                 protocol.RequestVersionReport();
                 //
                 //protocol.SysEx.CapabilityQuery();
+                protocol.DigitalWrite(13, Sharpduino.Core.DigitalValue.Low);
+                System.Console.WriteLine("Press key to exit.");
                 System.Console.ReadKey();
-
-				protocol.DigitalWrite (13, Sharpduino.Core.DigitalValue.Low);
 			}
-		}
-	}
+            System.Console.WriteLine("End");
+        }
+
+        private static void Protocol_ServerVersion(int mayorVersion, int minorVersion, string name)
+        {
+            System.Console.WriteLine("{0}.{1} {2}", mayorVersion, minorVersion, name);
+        }
+    }
 }

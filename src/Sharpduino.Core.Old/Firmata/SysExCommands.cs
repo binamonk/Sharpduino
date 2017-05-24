@@ -39,6 +39,9 @@ namespace Sharpduino.Firmata
                 case (byte)SysExCommandsEnum.ANALOG_MAPPING_RESPONSE:
                     AnalogMappingResponse(message);
                     break;
+                case (byte)SysExCommandsEnum.PIN_STATE_RESPONSE:
+                    PinStateResponse(message);
+                    break;
 			}
 		}
 
@@ -96,19 +99,36 @@ namespace Sharpduino.Firmata
 
 		public void CapabilityResponse (byte [] message){
 			int pinId = 0;
-			Debug.WriteLine ("Pin {0}", pinId);
-			for (int count = 2 ; count < 1024 ; count += 2) {
-				if (message[count] == (byte)SysExCommandsEnum.END_SYSEX) {
+            bool isMode = true;
+            bool pinPrinted = false;
+            for (int count = 2 ; count < 1024 ; count ++) {
+                if (message[count] == (byte)SysExCommandsEnum.END_SYSEX) {
 					break;
 				}
-				if (message [count] == 0x7F) {
-					pinId++;
-					count--;
-					Debug.WriteLine ("Pin {0}", pinId);
-				} else {
-					Debug.WriteLine ("     Pin Mode {0}", message [count]);
-					Debug.WriteLine ("     Pin Resolution {0}", message [count + 1]);
-				}
+                if (!pinPrinted) {
+                    Debug.WriteLine("Pin {0}", pinId);
+                    pinPrinted = true;
+                }
+                if (message[count] == 0x7F)
+                {
+                    pinId++;
+                    pinPrinted = false;
+                    isMode = true;
+                    continue;
+                }
+                else {
+                    
+                    if (isMode)
+                    {
+                        Debug.WriteLine("     Pin Mode {0}", Enum.Parse(typeof(Core.CapabilityPinMode), message[count].ToString()).ToString());
+                        isMode = false;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("     Pin Resolution {0}", message[count + 1]);
+                        isMode = true;
+                    }
+                }
 			}
 		}
 
@@ -128,7 +148,9 @@ namespace Sharpduino.Firmata
 
         public int[] AnalogMappingResponse(byte[] message) {
             int[] res = new int[message.Length - 3];
-            for (int count = 2; count < 1024; count += 2)
+            int count = 2;
+            while (message[count] != 0xF7 || count < 1024)
+            //for (int count = 2; count < 1024; count += 1)
             {
                 if (message[count] == (byte)SysExCommandsEnum.END_SYSEX)
                 {
@@ -136,7 +158,15 @@ namespace Sharpduino.Firmata
                 }
                 else {
                     res[count - 2] = message[count];
+                    if (message[count] == 0x7F)
+                    {
+                        Debug.WriteLine("Pin {0} not able to do Analog operations", count - 2);
+                    }
+                    else {
+                        Debug.WriteLine("Pin {0} able to do Analog operations at channel {1}", count - 2, message[count]);
+                    }
                 }
+                count++;
             }
             return res;
         }
@@ -156,8 +186,24 @@ namespace Sharpduino.Firmata
 			// Implement response
 		}
 
-        public void PinStateResponse() {
-            throw new NotImplementedException();
+        public void PinStateResponse(byte[] message) {
+            for (int count = 2; count < 1024; count++)
+            {
+                if (message[count] == (int)SysExCommandsEnum.END_SYSEX) {
+                    break;
+                }
+                switch (count) {
+                    case 2:
+                        Debug.WriteLine("Requested pin is {0}", message[count]);
+                        break;
+                    case 3:
+                        Debug.WriteLine("Pin Mode Is {0}", Enum.Parse(typeof(Core.CapabilityPinMode),message[count].ToString()).ToString());
+                        break;
+                    default:
+                        Debug.WriteLine("Pin state {0}", message[count]);
+                        break;
+                }
+            }
         }
         #endregion
 

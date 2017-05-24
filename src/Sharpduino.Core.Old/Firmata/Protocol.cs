@@ -47,6 +47,7 @@ namespace Sharpduino.Firmata
 		bool _parsingSysex;
 		int _sysexBytesRead;
 
+        // These are ports array.
 		volatile int[] _digitalOutputData = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		volatile int[] _digitalInputData  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		volatile int[] _analogInputData   = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -165,7 +166,13 @@ namespace Sharpduino.Firmata
             foreach (int n in _digitalOutputData) {
                 data = data + string.Format("{0:X}, ", n);
             }
-            _syncCtx.Send((x) => DigitalWriteData?.Invoke(data), null);
+            if (_syncCtx != null)
+            {
+                _syncCtx.Send((x) => DigitalWriteData?.Invoke(data), null);
+            }
+            else {
+                DigitalWriteData?.Invoke(data);
+            }
 		}
 
 		/// <summary>
@@ -351,7 +358,7 @@ namespace Sharpduino.Firmata
 					{
 						int inputData = _commTransport.ReadByte();
 						int command;
-						System.Diagnostics.Debug.WriteLine ("{0:X}", inputData);
+						Debug.WriteLine ("{0:X}", inputData);
                         if (DataRead != null)
                         {
                             _syncCtx.Send((x) => DataRead.Invoke(inputData), null);
@@ -377,7 +384,6 @@ namespace Sharpduino.Firmata
 
 							if (_executeMultiByteCommand != 0 && _waitForData == 0)
 							{
-								//we got everything
 								switch (_executeMultiByteCommand) {
 								    case (int)MessageTypesEnum.DIGITAL_MESSAGE:
 									    setDigitalInputs (_multiByteChannel, (_storedInputData [0] << 7) + _storedInputData [1]);
@@ -393,25 +399,25 @@ namespace Sharpduino.Firmata
 						}
 						else
 						{
-							if (inputData < (int)MessageTypesEnum.START_SYSEX)
-							{
-								command = inputData & (int)MessageTypesEnum.START_SYSEX;
-								_multiByteChannel = inputData & 0x0F;
-							}
-							else
-							{
-								command = inputData;
-								// commands in the 0xF* range don't use channel data
-							}
-							switch (command) {
+							command = inputData;
+                            if ((command & 0xF0) == (int)MessageTypesEnum.DIGITAL_MESSAGE) {
+                                _multiByteChannel = command & 0x0F;
+                                _waitForData = 2;
+                                _executeMultiByteCommand = (int)MessageTypesEnum.DIGITAL_MESSAGE;
+                            }
+                            if ((command & 0xE0) == (int)MessageTypesEnum.ANALOG_MESSAGE)
+                            {
+                                _multiByteChannel = command & 0x0F;
+                                _waitForData = 2;
+                                _executeMultiByteCommand = (int)MessageTypesEnum.ANALOG_MESSAGE;
+                            }
+                            switch (command) {
 							    case (int)MessageTypesEnum.START_SYSEX:
 								    _sysexBytesRead = 0;
 								    _storedInputData [_sysexBytesRead] = (byte)MessageTypesEnum.START_SYSEX;
 								    _sysexBytesRead++;
 								    _parsingSysex = true;
 								    break;
-							    case (int)MessageTypesEnum.DIGITAL_MESSAGE:
-							    case (int)MessageTypesEnum.ANALOG_MESSAGE:
 							    case (int)MessageTypesEnum.REPORT_VERSION:
 								    _waitForData = 2;
 								    _executeMultiByteCommand = command;
@@ -431,10 +437,11 @@ namespace Sharpduino.Firmata
 		#region IDisposable implementation
 		public void Dispose ()
 		{
-			if (this.IsOpen) {
-				this.Close ();
+			if (IsOpen) {
+				Close ();
 			}
-		}
+            _sysEx.OnQueryFirmwareNameAndVersionResponse -= _sysEx_OnQueryFirmwareNameAndVersionResponse;
+        }
 		#endregion
 	}
 }
